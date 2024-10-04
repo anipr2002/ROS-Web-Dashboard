@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import useRosStore from "@/store/rosStore";
 import TopicPage from "./_components/TopicPage";
 
@@ -10,7 +10,7 @@ const Topics = () => {
 
   const { defaultTopicData, setDefaultTopicData } = useTopicStore();
 
-  const ignoreTopics = ["/rosout", "/parameter_events"];
+  //   const ignoreTopics = ["/rosout", "/parameter_events"];
 
   useEffect(() => {
     if (ros) {

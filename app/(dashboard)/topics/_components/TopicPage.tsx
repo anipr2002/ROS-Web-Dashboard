@@ -25,7 +25,7 @@ export default function TopicPage({
           <div className="flex flex-wrap gap-10 w-full justify-center">
             {/* If filteredTopics is not empty, map over it, otherwise show all */}
             {filteredTopics.length > 0
-              ? filteredTopics.map((topic, index) => (
+              ? filteredTopics.map((topic) => (
                   <TopicCard
                     key={topic}
                     topicName={topic}

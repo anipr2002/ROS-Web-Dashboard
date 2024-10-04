@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { getTopic } from "@/roslib/topic";
 import useTopicStore from "@/store/topicStore";
 import useRosStore from "@/store/rosStore";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -15,14 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  Sparkles,
-  Zap,
-  AlertCircle,
-  ChevronDown,
-  ChevronUp,
-  Maximize2,
-} from "lucide-react";
+import { Zap, AlertCircle, Maximize2 } from "lucide-react";
 
 interface TopicCardProps {
   topicName: string;
