@@ -34,7 +34,7 @@ export default function TopicCard({ topicName, topicType }: TopicCardProps) {
         ros,
         topicName,
         topicType,
-        throtle_rate: 10,
+        throtle_rate: 1500,
       });
       topic.subscribe((message) => {
         if (typeof message === "string") {
