@@ -1,7 +1,11 @@
 import React from "react";
-
+import ROSTopicPublisher from "./_components/Publish";
 const Publish = () => {
-  return <div>Publish</div>;
+  return (
+    <>
+      <ROSTopicPublisher />
+    </>
+  );
 };
 
 export default Publish;

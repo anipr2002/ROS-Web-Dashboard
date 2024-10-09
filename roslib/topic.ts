@@ -27,7 +27,7 @@ export const getTopicsFromType = ({
     topicType: string,
     ros: ROSLIB.Ros
 }) => {
-    let topics : string[]= [];
+    const topics : string[]= [];
 
     ros.getTopicsForType(topicType, (topicsArray: string[]) => {
         topics.push(...topicsArray);

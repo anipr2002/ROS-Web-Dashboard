@@ -11,8 +11,8 @@ const config: Config = {
   	extend: {
 
          fontFamily: {
-
             roger: ['var(--font-roger)', ...fontFamily.sans],
+            animal: ["var(--font-animal)", ...fontFamily.sans],
          },
          animation: {
         ripple: "ripple var(--duration,2s) ease calc(var(--i, 0)*.2s) infinite",

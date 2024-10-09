@@ -24,9 +24,11 @@ const Topics = () => {
     }
   }, [ros, isConnected]);
 
+  console.log(defaultTopicData);
+
   return (
     <>
-      <TopicPage topicsData={defaultTopicData} />;
+      <TopicPage topicsData={defaultTopicData} />
     </>
   );
 };

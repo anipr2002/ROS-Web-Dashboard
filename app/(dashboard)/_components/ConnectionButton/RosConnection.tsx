@@ -1,6 +1,6 @@
 "use client";
 
-import React, { forwardRef, useRef } from "react";
+import React, { forwardRef, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 import { IconCloudFilled } from "@tabler/icons-react";
 import { CloudOff, Radio } from "lucide-react";
@@ -44,6 +44,8 @@ export function RosConnection() {
 
   const { rosUrl, isConnected, setRosUrl, connect, disconnect } = useRosStore();
   const rosRef = useRef<HTMLInputElement>(null);
+
+  //   setRosUrl to 9090 initially
 
   return (
     <div

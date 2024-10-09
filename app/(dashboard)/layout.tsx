@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Sidebar, SidebarBody, SidebarLink } from "@/components/ui/sidebar";
 import {
   IconBrandTabler,
@@ -10,6 +10,10 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import ConnectionButton from "./_components/ConnectionButton/ConnectionStatusButton";
+import useRosStore from "@/store/rosStore";
+import Image from "next/image";
+
+import { CommandDialogDemo } from "./_components/Cmndk/CommandK";
 
 function Layout({ children }: { children: React.ReactNode }) {
   const links = [
@@ -22,7 +26,7 @@ function Layout({ children }: { children: React.ReactNode }) {
     },
     {
       label: "Topics",
-      href: "/topics",
+      href: "/topics/subscribe",
       icon: (
         <IconUserBolt className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
       ),
@@ -36,6 +40,16 @@ function Layout({ children }: { children: React.ReactNode }) {
     },
   ];
   const [open, setOpen] = useState(false);
+
+  const { rosUrl, connect, setRosUrl } = useRosStore();
+
+  useEffect(() => {
+    if (rosUrl === "ws://localhost:9090") {
+      setRosUrl("ws://localhost:9090");
+      connect();
+    }
+  }, []);
+
   return (
     <div
       className={cn(
@@ -60,6 +74,7 @@ function Layout({ children }: { children: React.ReactNode }) {
         </SidebarBody>
       </Sidebar>
       <ConnectionButton />
+      <CommandDialogDemo />
       <div className="flex flex-1">
         <div className="p-2 md:p-10 rounded-tl-2xl border border-neutral-200 overflow-y-scroll dark:border-neutral-700 dark:bg-neutral-900 flex flex-col gap-2 flex-1 w-full h-full">
           {children}
@@ -74,21 +89,20 @@ export const Logo = () => {
       href="/"
       className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
     >
-      {/* <div className="h-5 w-6 bg-black dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" /> */}
-      {/* <Image
-        src="/thws-favicon.png"
-        alt="RoboPig Logo"
+      <Image
+        src="/logo.svg"
+        alt="ROSUI logo"
         width={40}
         height={40}
         className="rounded-sm"
-      /> */}
-      <div className="h-5 w-6 bg-black dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
+      />
+      {/* <div className="h-5 w-6 bg-black dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" /> */}
       <motion.span
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="font-bold text-2xl dark:text-white whitespace-pre"
+        className="font-bold text-6xl dark:text-white whitespace-pre font-animal"
       >
-        ROS WEB
+        RosUI
       </motion.span>
     </Link>
   );
@@ -99,14 +113,14 @@ export const LogoIcon = () => {
       href="/dashboard"
       className="font-normal flex space-x-2 items-center text-sm text-black py-1 relative z-20"
     >
-      <div className="h-5 w-6 bg-black dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" />
-      {/* <Image
-        src="/thws-favicon.png"
+      {/* <div className="h-5 w-6 bg-black dark:bg-white rounded-br-lg rounded-tr-sm rounded-tl-lg rounded-bl-sm flex-shrink-0" /> */}
+      <Image
+        src="/logo.svg"
         className="rounded-sm"
         alt="RoboPig Logo"
         width={24}
         height={20}
-      /> */}
+      />
     </Link>
   );
 };
