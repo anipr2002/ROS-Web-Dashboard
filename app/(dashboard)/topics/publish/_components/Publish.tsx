@@ -22,10 +22,13 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import useTopicStore from "@/store/topicStore"; // Ensure this import points to the correct location of your store
+import useTopicStore from "@/store/topicStore";
 import useRosStore from "@/store/rosStore";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
+import { publishTopic, createNewTopic } from "@/roslib/topic";
+import * as ROSLIB from "roslib";
+import { Send, Plus, Radio, MessageSquare, Loader2 } from "lucide-react";
 
 export default function ROSTopicPublisher() {
   const {
@@ -37,15 +40,25 @@ export default function ROSTopicPublisher() {
     setViewType,
   } = useTopicStore();
 
-  const { isConnected } = useRosStore();
+  const { isConnected, ros } = useRosStore();
 
   const [message, setMessage] = useState("");
   const [newTopic, setNewTopic] = useState({ name: "", type: "" });
-  const [selectedTopic, setSelectedTopic] = useState<string | null>(null);
+  const [selectedTopic, setSelectedTopic] = useState<{
+    name: string;
+    type: string;
+  } | null>(null);
 
-  const handlePublish = (topicName: string) => {
-    // Here you would implement the actual publishing logic using roslibjs
-    console.log(`Publishing to ${topicName}: ${message}`);
+  const handlePublish = (topicName: string, topicType: string) => {
+    publishTopic({
+      ros: ros!,
+      topicName,
+      topicType,
+      message,
+      throtle_rate: 10,
+    });
+
+    toast.success(`Published to ${topicName} of type ${topicType}`);
     // Reset message and close dialog
     setMessage("");
     setSelectedTopic(null);
@@ -53,10 +66,17 @@ export default function ROSTopicPublisher() {
 
   const handleCreateTopic = () => {
     if (newTopic.name && newTopic.type && defaultTopicData) {
+      const createdTopic = createNewTopic({
+        ros: ros!,
+        topicName: newTopic.name,
+        topicType: newTopic.type,
+      });
+
       setDefaultTopicData({
-        topics: [...defaultTopicData.topics, newTopic.name],
+        topics: [...defaultTopicData.topics, createdTopic.name],
         types: [...defaultTopicData.types, newTopic.type],
       });
+
       setNewTopic({ name: "", type: "" });
     }
     toast.success(
@@ -72,7 +92,6 @@ export default function ROSTopicPublisher() {
       )
     : [];
 
-  console.log(isConnected);
   return (
     <>
       {isConnected ? (
@@ -109,18 +128,30 @@ export default function ROSTopicPublisher() {
             {filteredTopics.map((topic, index) => (
               <Card key={topic}>
                 <CardHeader>
-                  <CardTitle>{topic}</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    <MessageSquare className="w-5 h-5 text-primary" />
+                    {topic}
+                  </CardTitle>
                   <CardDescription>
                     {defaultTopicData?.types[index]}
                   </CardDescription>
                 </CardHeader>
                 <CardFooter>
                   <Dialog
-                    open={selectedTopic === topic}
+                    open={selectedTopic?.name === topic}
                     onOpenChange={(open) => !open && setSelectedTopic(null)}
                   >
                     <DialogTrigger asChild>
-                      <Button onClick={() => setSelectedTopic(topic)}>
+                      <Button
+                        className="flex items-center gap-2 w-full"
+                        onClick={() =>
+                          setSelectedTopic({
+                            name: topic,
+                            type: defaultTopicData!.types[index],
+                          })
+                        }
+                      >
+                        <Send className="w-4 h-4 mr-2" />
                         Publish
                       </Button>
                     </DialogTrigger>
@@ -137,7 +168,15 @@ export default function ROSTopicPublisher() {
                         placeholder="Enter your message here"
                       />
                       <DialogFooter>
-                        <Button onClick={() => handlePublish(topic)}>
+                        <Button
+                          onClick={() =>
+                            selectedTopic &&
+                            handlePublish(
+                              selectedTopic.name,
+                              selectedTopic.type
+                            )
+                          }
+                        >
                           Publish
                         </Button>
                       </DialogFooter>
@@ -182,7 +221,13 @@ export default function ROSTopicPublisher() {
               </div>
             </CardContent>
             <CardFooter>
-              <Button onClick={handleCreateTopic}>Create Topic</Button>
+              <Button
+                className="flex items-center gap-2"
+                onClick={handleCreateTopic}
+              >
+                <Plus className="w-4 h-4 " />
+                Create Topic
+              </Button>
             </CardFooter>
           </Card>
         </div>
