@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import { roger, animal } from "./fonts/font";
+
 // import { ThemeProvider } from "@/components/theme-provider";
 
 const geistSans = localFont({
@@ -13,15 +15,6 @@ const geistMono = localFont({
   src: "./fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
   weight: "100 900",
-});
-const roger = localFont({
-  variable: "--font-roger",
-  src: "./fonts/roger.otf",
-});
-
-export const animal = localFont({
-  variable: "--font-animal",
-  src: "./fonts/animal.ttf",
 });
 
 export const metadata: Metadata = {
