@@ -1,14 +1,20 @@
 import { create } from 'zustand';
 
-interface ServiceStore{
-   defaultServiceList : string[] | null;
-   setDefaultServiceList : (defaultServiceList : string[] | null) => void;
+export interface IService {
+    serviceName: string;
+    serviceType: string;
+    args? : unknown
 }
 
-const useServiceStore = create<ServiceStore>((set) => ({
-    defaultServiceList : null,
-    setDefaultServiceList : (defaultServiceList) => set({ defaultServiceList }),
-}));
+interface ServiceStore {
+    defaultServiceList: IService[] | null;
+    setDefaultServiceList: (defaultServiceList: IService[] | null) => void;
+}
 
+
+const useServiceStore = create<ServiceStore>((set) => ({
+    defaultServiceList: null,
+    setDefaultServiceList: (defaultServiceList) => set({ defaultServiceList }),
+}));
 
 export default useServiceStore;
