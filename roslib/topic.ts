@@ -1,81 +1,58 @@
 import * as ROSLIB from 'roslib';
+import { ITopic } from "@/store/topicStore";
 
-export const getTopic = ({
-    topicName,
-    topicType,
-    ros,
-    throtle_rate
-} : {
-    topicName: string,
-    topicType: string,
-    ros: ROSLIB.Ros,
-    throtle_rate?: number
-}) => {
+    type topicType = {
+            topics : string[],
+            types : string[]
+    }
+
+export const getTopicsFromRos = (ros: ROSLIB.Ros) => {
+
+   return new Promise<ITopic[]>((resolve) => {
+        ros.getTopics((result) => {
+            const topics = result;
+            resolve(getTopicsFromType(topics));
+        });
+    });
+}
+
+export const getTopic = (topicName: string, topicType: string, ros: ROSLIB.Ros) => {
     const topic = new ROSLIB.Topic({
-        ros,
+        ros ,
         name: topicName,
         messageType: topicType,
-        throttle_rate: throtle_rate,
+        throttle_rate: 1500,
     });
     return topic;
 }
+// now convert the topicType to ITopic
+const getTopicsFromType = (
+    topicType: topicType
+) => {
 
-export const getTopicsFromType = ({
-    topicType,
-    ros,
-}:{
-    topicType: string,
-    ros: ROSLIB.Ros
-}) => {
-    const topics : string[]= [];
+    const topics : ITopic[] = [];
 
-    ros.getTopicsForType(topicType, (topicsArray: string[]) => {
-        topics.push(...topicsArray);
-    });
+    const topicNames = topicType.topics;
+    const topicTypes = topicType.types;
 
-    return topics;
+    topicNames.forEach((topicName, index) => {
+        topics.push({
+            topicName,
+            topicType: topicTypes[index],
+            type: 'subscriber'
+        })
+    })
+
+     return topics;
 }
 
-export const publishTopic = ({
-    ros,
-    topicName,
-    topicType,
-    message,
-    throtle_rate = 10,
-} : {
+export const publishTopic = (
     ros: ROSLIB.Ros,
     topicName: string,
     topicType: string,
-    message: string,
-    throtle_rate?: number }) => {
-    const topic = getTopic({
-        ros,
-        topicName,
-        topicType,
-        throtle_rate
-    });
-
+    message : string,
+) => {
+    const topic = getTopic(topicName, topicType, ros);
     const newMessage = new ROSLIB.Message(JSON.parse(message));
-
     topic.publish(newMessage);
-}
-
-export const createNewTopic = ({
-    ros,
-    topicName,
-    topicType,
-} : {
-    ros: ROSLIB.Ros,
-    topicName: string,
-    topicType: string,
-}) => {
-    const topic = new ROSLIB.Topic({
-        ros,
-        name: topicName,
-        messageType: topicType,
-    });
-
-    topic.advertise();
-
-    return topic;
 }

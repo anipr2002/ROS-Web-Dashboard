@@ -1,10 +1,11 @@
 import React from "react";
-import ROSTopicPublisher from "./_components/Publish";
+import PublishPage from "./PublishPage";
+
 const Publish = () => {
   return (
-    <>
-      <ROSTopicPublisher />
-    </>
+    <div>
+      <PublishPage />
+    </div>
   );
 };
 
