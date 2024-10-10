@@ -1,25 +1,24 @@
 import { create } from 'zustand';
 
+export interface ITopic{
+    topicName : string;
+    topicType : string;
+    message?: string | null;
+    type?: 'subscriber' | 'publisher';
+}
+
 interface TopicStore{
-    defaultTopicData : {topics : string[], types : string[]} | null;
-    setDefaultTopicData : (defaultTopicData : {topics : string[], types : string[]} | null) => void;
-
-    selectedTopicType : string | null;
-    setSelectedTopicType : (topicType : string | null) => void;
-
-    viewType : 'All' | 'TopicType';
-    setViewType : (viewType : 'All' | 'TopicType') => void;
+    defaultTopicData : ITopic[] | null;
+    setDefaultTopicData : (defaultTopicData : ITopic[] | null) => void;
+    selectedTopic? : ITopic | null;
+    setSelectedTopic : (selectedTopic : ITopic | null) => void;
 }
 
 const useTopicStore = create<TopicStore>((set) => ({
     defaultTopicData : null,
     setDefaultTopicData : (defaultTopicData) => set({ defaultTopicData }),
-
-    selectedTopicType : null,
-    setSelectedTopicType : (topicType) => set({ selectedTopicType : topicType, viewType : 'TopicType' }),
-
-    viewType : 'All',
-    setViewType : (viewType) => set({ viewType }),
+    selectedTopic : null,
+    setSelectedTopic : (selectedTopic) => set({ selectedTopic }),
 }));
 
 export default useTopicStore;

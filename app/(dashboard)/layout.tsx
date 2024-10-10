@@ -14,6 +14,8 @@ import useRosStore from "@/store/rosStore";
 import Image from "next/image";
 
 import { CommandDialogDemo } from "./_components/Cmndk/CommandK";
+import { getTopicsFromRos } from "@/roslib/topic";
+import useTopicStore from "@/store/topicStore";
 
 function Layout({ children }: { children: React.ReactNode }) {
   const links = [
@@ -49,6 +51,18 @@ function Layout({ children }: { children: React.ReactNode }) {
       connect();
     }
   }, []);
+
+  const { ros } = useRosStore();
+
+  const { setDefaultTopicData } = useTopicStore();
+
+  useEffect(() => {
+    if (ros) {
+      getTopicsFromRos(ros).then((topics) => {
+        setDefaultTopicData(topics);
+      });
+    }
+  }, [ros, setDefaultTopicData]);
 
   return (
     <div

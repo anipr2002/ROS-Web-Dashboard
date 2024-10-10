@@ -1,12 +1,9 @@
 "use client";
-
-import { useState, useEffect } from "react";
-import { getTopic } from "@/roslib/topic";
-import useTopicStore from "@/store/topicStore";
+import React, { useState } from "react";
 import useRosStore from "@/store/rosStore";
+import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   Dialog,
@@ -15,54 +12,37 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Zap, AlertCircle, Maximize2 } from "lucide-react";
+import { Zap, AlertCircle, Maximize2, Send } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { publishTopic } from "@/roslib/topic";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
 
-interface TopicCardProps {
+const PublishCard = ({
+  topicName,
+  topicType,
+}: {
   topicName: string;
   topicType: string;
-}
-
-export default function TopicCard({ topicName, topicType }: TopicCardProps) {
-  const [lastMessage, setLastMessage] = useState("Waiting for message...");
-  const { ros, isConnected } = useRosStore();
-  const { setSelectedTopicType, selectedTopicType, setViewType, viewType } =
-    useTopicStore();
-
-  useEffect(() => {
-    if (ros) {
-      const topic = getTopic({
-        ros,
-        topicName,
-        topicType,
-        throtle_rate: 1500,
-      });
-      topic.subscribe((message) => {
-        if (typeof message === "string") {
-          setLastMessage(message);
-        } else {
-          setLastMessage(JSON.stringify(message, null, 2));
-        }
-      });
-      return () => {
-        topic.unsubscribe();
-      };
-    }
-  }, [ros, topicName, topicType]);
-
+}) => {
   const cardVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   };
 
-  const handleTopicTypeClick = () => {
-    if (viewType === "All" || selectedTopicType !== topicType) {
-      // Set to topic type if viewType is "All" or a new topic is clicked
-      setViewType("TopicType");
-      setSelectedTopicType(topicType);
-    } else {
-      // Reset to "All" if the same topicType badge is clicked again
-      setViewType("All");
-      setSelectedTopicType(null);
+  const [message, setMessage] = useState<string>("");
+  const [messageHistory, setMessageHistory] = useState<string[]>([]);
+  const { isConnected, ros } = useRosStore();
+
+  const handlePublish = () => {
+    if (message.trim() !== "") {
+      if (ros) {
+        console.log("publishing to" + topicName);
+        publishTopic(ros, topicName, topicType, message);
+        toast.success(`Published to ${topicName} of type ${topicType}`);
+        setMessageHistory((prev) => [...prev, message]);
+        setMessage("");
+      }
     }
   };
 
@@ -80,7 +60,6 @@ export default function TopicCard({ topicName, topicType }: TopicCardProps) {
         <Badge
           variant="outline"
           className="text-sm cursor-pointer hover:bg-gray-200"
-          onClick={handleTopicTypeClick}
         >
           {topicType}
         </Badge>
@@ -88,9 +67,24 @@ export default function TopicCard({ topicName, topicType }: TopicCardProps) {
       <div className="bg-white dark:bg-gray-800 rounded-md p-4 mb-4 border border-gray-200 dark:border-gray-700">
         <ScrollArea className="h-32 w-full">
           <pre className="text-xs font-mono break-all whitespace-pre-wrap text-gray-700 dark:text-gray-300">
-            {lastMessage}
+            <Textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Enter message..."
+              className=""
+            />
           </pre>
         </ScrollArea>
+      </div>
+      <div className="flex justify-between items-center mb-4">
+        <Button
+          onClick={handlePublish}
+          disabled={!isConnected || message.trim() === ""}
+          className="w-full flex items-center justify-center"
+        >
+          <Send className="mr-2 h-4 w-4" />
+          Publish
+        </Button>
       </div>
       <div className="flex justify-between items-center">
         <div className="flex items-center">
@@ -120,7 +114,7 @@ export default function TopicCard({ topicName, topicType }: TopicCardProps) {
             </DialogHeader>
             <ScrollArea className="h-[400px] w-full rounded-md border p-4">
               <pre className="text-md font-mono break-all whitespace-pre-wrap text-gray-700 dark:text-gray-300">
-                {lastMessage}
+                {messageHistory.join("\n")}
               </pre>
             </ScrollArea>
           </DialogContent>
@@ -128,4 +122,6 @@ export default function TopicCard({ topicName, topicType }: TopicCardProps) {
       </div>
     </motion.div>
   );
-}
+};
+
+export default PublishCard;
